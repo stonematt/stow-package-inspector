@@ -99,6 +99,10 @@ stow_check [options]
 
 ### Default Output
 
+```bash
+stow_check
+```
+
 ```plaintext
 Checking packages in packages_to_stow...
 
