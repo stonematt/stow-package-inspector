@@ -137,11 +137,11 @@ stowed: htop
 
 Generate a full report and include stowed packages:
 
-````bash
+```bash
 stow_check -fs
 ```
 
-``` plaintext
+```plaintext
 Checking packages in packages_to_stow...
 Checking available packages not in packages_to_stow...
 
@@ -168,7 +168,7 @@ Other available packages:
 stowed: htop
 stowed: kitty
 stowed: lsd
-````
+```
 
 ## Contributing
 
