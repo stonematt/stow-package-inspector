@@ -16,7 +16,7 @@ in `packages_to_stow`, depending on the options provided.
   `packages_to_stow` to identify:
 
   - **Conflicts**: Files or directories blocking symlink creation.
-  - **Incomplete Stows**: Packages with partially missing symlinks.
+  - **Incomplete Stows**: Packages with one or more symlinks missing.
   - **Not Stowed**: Packages listed but not yet stowed.
   - **Stowed**: Fully stowed packages (optional to include in reports).
 
@@ -132,8 +132,8 @@ not_stowed: alacritty
 not_stowed: ripgrep
 
 Other available packages:
-stowed: kitty
-stowed: lsd
+not_stowed: kitty
+not_stowed: lsd
 stowed: htop
 ```
 
