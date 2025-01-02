@@ -82,8 +82,8 @@ in `packages_to_stow`, depending on the options provided.
 - A `.stowrc` file with the following format:
 
   ```plaintext
-  --dir=<path-to-stow-directory>
-  --target=<target-directory>
+  --dir=<path-to-stow-directory>  # eg. your dotfiles repo
+  --target=<target-directory>     # eg. $HOME
   ```
 
 - A `packages_to_stow` file listing the packages to be managed (one package
