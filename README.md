@@ -54,7 +54,7 @@ in `packages_to_stow`, depending on the options provided.
 ## Usage
 
 ```bash
-./stow_check [options]
+stow_check [options]
 ```
 
 ### Options
@@ -73,7 +73,7 @@ in `packages_to_stow`, depending on the options provided.
    Inspect `packages_to_stow`, excluding fully stowed packages:
 
    ```bash
-   ./stow_check
+   stow_check
    ```
 
 ## Requirements
@@ -114,7 +114,7 @@ not_stowed: ripgrep
 Include both `packages_to_stow` and available packages in the stow directory:
 
 ```bash
-./stow_check -f
+stow_check -f
 ```
 
 ```plaintext
@@ -138,8 +138,8 @@ stowed: htop
 Generate a full report and include stowed packages:
 
 ````bash
-./stow_check -fs
-
+stow_check -fs
+```
 
 ``` plaintext
 Checking packages in packages_to_stow...
