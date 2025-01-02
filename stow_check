@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Arguments
+HELP=false
+VERBOSE=false
+FULL=false
+INCLUDE_STOWED=false
+AVAILABLE_ONLY=false
+
+# Parse arguments
+while getopts "hvfsa" opt; do
+  case $opt in
+  h) HELP=true ;;
+  v) VERBOSE=true ;;
+  f) FULL=true ;;           # Full report (both available packages and packages_to_stow)
+  s) INCLUDE_STOWED=true ;; # Include stowed packages in the packages_to_stow report
+  a) AVAILABLE_ONLY=true ;; # Report only available packages
+  *)
+    echo "Invalid option: -$OPTARG" >&2
+    exit 1
+    ;;
+  esac
+done
+
+if $HELP; then
+  echo "SUMMARY:"
+  echo "  Inspect the health and availability of stowed packages."
+  echo "  The script checks the status of packages listed in 'packages_to_stow' and/or"
+  echo "  directories available in the stow directory."
+  echo ""
+  echo "USAGE:"
+  echo "  $0 [-h] [-v] [-f] [-s] [-a]"
+  echo ""
+  echo "OPTIONS:"
+  echo "  -h: Display this help message."
+  echo "  -v: Enable verbose output (show the stow command being executed for each package)."
+  echo "  -f: Include available packages not listed in 'packages_to_stow'."
+  echo "  -s: Include stowed packages in the 'packages_to_stow' report."
+  echo "  -a: Show only available packages (ignore packages in 'packages_to_stow')."
+  echo ""
+  echo "EXAMPLES:"
+  echo "  ./stow_check            # Default: Check packages_to_stow (exclude stowed packages)."
+  echo "  ./stow_check -f         # Full report: Include available packages."
+  echo "  ./stow_check -s         # Include stowed packages in the packages_to_stow report."
+  echo "  ./stow_check -fa        # Full report: Include both available and stowed packages."
+  echo "  ./stow_check -a         # Only show available packages."
+  exit 0
+fi
+
+# Packages file
+PACKAGES_FILE="packages_to_stow"
+if [ ! -f "$PACKAGES_FILE" ]; then
+  echo "Error: packages_to_stow file not found."
+  exit 1
+fi
+# List of packages in packages_to_stow
+PACKAGES_TO_STOW=($(grep -v '^#' "$PACKAGES_FILE" | sed 's:/*$::')) # Skip empty lines and comments
+
+# List of all available packages (directories in the stow directory)
+STOW_DIR=$(grep -- '--dir=' .stowrc | cut -d '=' -f2)
+STOW_DIR=$(eval echo "$STOW_DIR") # Use eval to expand $HOME
+
+# Get the list of available packages
+AVAILABLE_PACKAGES=($(/bin/ls -1d "$STOW_DIR"/*/ | xargs -n 1 basename)) # Use quotes to prevent word splitting
+
+# Initialize report arrays
+pkg_report=()
+avl_report=()
+
+# Function to determine stow status
+stow_status() {
+  local package="$1"
+  local stowcmd="stow -n \"$package\""
+  local output
+
+  # Verbose output
+  if $VERBOSE; then
+    echo "Inspecting $package"
+    echo "Executing: $stowcmd"
+  fi
+
+  # Capture the output of the stow command
+  output=$(eval "$stowcmd" 2>&1 || true)
+
+  # Determine status
+  if echo "$output" | grep -q "CONFLICT"; then
+    echo "conflict: $package"
+  elif echo "$output" | grep -q "LINK:" && echo "$output" | grep -q "Skipping"; then
+    echo "incomplete: $package"
+  elif echo "$output" | grep -q "Skipping .* as it already points to"; then
+    echo "stowed: $package"
+  elif echo "$output" | grep -q "LINK:"; then
+    echo "not_stowed: $package"
+  else
+    echo "not_stowed: $package"
+  fi
+}
+
+# Process packages_to_stow
+if ! $AVAILABLE_ONLY; then
+  echo "Checking packages in packages_to_stow..."
+  for package in "${PACKAGES_TO_STOW[@]}"; do
+    if [ -n "$package" ]; then         # Ensure the package is not empty
+      result=$(stow_status "$package") # Call the stow_status function
+      if $INCLUDE_STOWED || [[ ! $result =~ ^stowed ]]; then
+        pkg_report+=("$result") # Append the result if INCLUDE_STOWED or it's not stowed
+      fi
+    fi
+  done
+fi
+
+# Process available packages not in packages_to_stow
+if $FULL || $AVAILABLE_ONLY; then
+  echo "Checking available packages not in packages_to_stow..."
+  for package in "${AVAILABLE_PACKAGES[@]}"; do
+    if [[ ! " ${PACKAGES_TO_STOW[@]} " =~ " $package " ]]; then
+      avl_report+=("$(stow_status "$package")")
+    fi
+  done
+fi
+
+# Sort and display the report
+if ! $AVAILABLE_ONLY; then
+  echo ""
+  echo "Expected Packages from packages_to_stow:"
+  printf "%s\n" "${pkg_report[@]}" | sort
+fi
+
+if $FULL || $AVAILABLE_ONLY; then
+  echo ""
+  echo "Other available packages:"
+  printf "%s\n" "${avl_report[@]}" | sort
+fi
