@@ -1,9 +1,14 @@
 # Stow Package Inspector
 
 A lightweight shell script to inspect the health and availability of stowed
-packages managed with GNU Stow. This script provides detailed reports on the
-status of your stowed packages, helping you identify conflicts, incomplete
-stows, and unused packages in your stow directory.
+packages managed with GNU Stow. By default, this script focuses on identifying
+packages listed in `packages_to_stow` that are expected to be stowed but are
+not. It highlights issues such as conflicts, incomplete stows, and missing
+symlinks.
+
+Additionally, the script provides detailed reports on fully stowed packages
+and identifies unused directories in your stow directory that are not listed
+in `packages_to_stow`, depending on the options provided.
 
 ## Features
 
@@ -36,7 +41,7 @@ stows, and unused packages in your stow directory.
 2. Make the script executable:
 
    ```bash
-   chmod +x stow_check.sh
+   chmod +x stow_check
    ```
 
 3. Ensure `stow` is installed on your system:
@@ -49,7 +54,7 @@ stows, and unused packages in your stow directory.
 ## Usage
 
 ```bash
-./stow_check.sh [options]
+./stow_check [options]
 ```
 
 ### Options
@@ -69,35 +74,7 @@ stows, and unused packages in your stow directory.
    Inspect `packages_to_stow`, excluding fully stowed packages:
 
    ```bash
-   ./stow_check.sh
-   ```
-
-2. **Full Report**:
-   Include both `packages_to_stow` and available packages in the stow directory:
-
-   ```bash
-   ./stow_check.sh -f
-   ```
-
-3. **Include Stowed**:
-   Include stowed packages in the `packages_to_stow` report:
-
-   ```bash
-   ./stow_check.sh -s
-   ```
-
-4. **Only Available**:
-   Show only available packages in the stow directory:
-
-   ```bash
-   ./stow_check.sh -a
-   ```
-
-5. **Combine Options**:
-   Generate a full report and include stowed packages:
-
-   ```bash
-   ./stow_check.sh -fs
+   ./stow_check
    ```
 
 ## Requirements
@@ -135,6 +112,12 @@ not_stowed: ripgrep
 
 ### Full Report (`-f`)
 
+Include both `packages_to_stow` and available packages in the stow directory:
+
+```bash
+./stow_check -f
+```
+
 ```plaintext
 Checking packages in packages_to_stow...
 Checking available packages not in packages_to_stow...
@@ -150,6 +133,43 @@ stowed: kitty
 stowed: lsd
 stowed: htop
 ```
+
+### Combine options (-fs)
+
+Generate a full report and include stowed packages:
+
+````bash
+./stow_check -fs
+
+
+``` plaintext
+Checking packages in packages_to_stow...
+Checking available packages not in packages_to_stow...
+
+Expected Packages from packages_to_stow:
+conflict: aws
+conflict: conda
+conflict: ssh
+conflict: vim
+incomplete: git
+not_stowed: alacritty
+not_stowed: ripgrep
+stowed: aerospace
+stowed: bash
+stowed: bat
+stowed: btop
+stowed: espanso
+stowed: ghostty
+stowed: nvim
+stowed: starship
+stowed: stow
+stowed: tmux
+
+Other available packages:
+stowed: htop
+stowed: kitty
+stowed: lsd
+````
 
 ## Contributing
 
@@ -170,3 +190,7 @@ details.
 ---
 
 Feel free to reach out with any questions or suggestions!
+
+```
+
+```
