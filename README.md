@@ -59,14 +59,13 @@ in `packages_to_stow`, depending on the options provided.
 
 ### Options
 
-| Option | Description                                                           |
-| ------ | --------------------------------------------------------------------- |
-| `-h`   | Display help and usage information.                                   |
-| `-v`   | Enable verbose output (show the `stow` command being executed for     |
-|        | each package).                                                        |
-| `-f`   | Include available packages not listed in `packages_to_stow`.          |
-| `-s`   | Include stowed packages in the `packages_to_stow` report.             |
-| `-a`   | Show only available packages (ignore packages in `packages_to_stow`). |
+| Option | Description                                                                      |
+| ------ | -------------------------------------------------------------------------------- |
+| `-h`   | Display help and usage information.                                              |
+| `-v`   | Enable verbose output (show the `stow` command being executed for each package). |
+| `-f`   | Include available packages not listed in `packages_to_stow`.                     |
+| `-s`   | Include stowed packages in the `packages_to_stow` report.                        |
+| `-a`   | Show only available packages (ignore packages in `packages_to_stow`).            |
 
 ### Examples
 
